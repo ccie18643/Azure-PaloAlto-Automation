@@ -1,0 +1,124 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "network_id": {
+            "type": "String",
+            "defaultValue": null
+        },
+        "site_id": {
+            "type": "string",
+            "defaultValue": null
+        },
+        "vm_name": {
+            "type": "string",
+            "defaultValue": null
+        },
+        "subnet_name": {
+            "type": "string",
+            "defaultValue": null
+        },
+        "ip_address": {
+            "type": "string",
+            "defaultValue": null
+        },
+        "username": {
+            "type": "string",
+            "defaultValue": null
+        },
+        "rsa_key": {
+            "type": "string",
+            "defaultValue": null
+        }
+    },
+    "variables": {
+        "network_id": "[parameters('network_id')]",
+        "site_id": "[parameters('site_id')]",
+        "vm_name": "[parameters('vm_name')]",
+        "subnet_name": "[parameters('subnet_name')]",
+        "username": "[parameters('username')]",
+        "rsa_key": "[parameters('rsa_key')]",
+
+        "tags": {"Department": "IT", "Project": "[concat(variables('site_id'), ' Azure Data Center')]", "Project Manager": "Sebastian Majewski"},
+
+        "vnet_name": "[concat('VNET_', variables('site_id'), '_CORE')]",
+        "nic_name": "[concat('NIC_', variables('vm_name'), '_ETH0')]",
+        "ip_address": "[parameters('ip_address')]"
+    },
+    "resources": [
+        {
+            "name": "[variables('nic_name')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2019-07-01",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "Primary",
+                        "properties": {
+                            "subnet": {
+                                "id": "[resourceId(concat('RG_', variables('site_id'), '_NETWORK'), 'Microsoft.Network/virtualNetworks/subnets', variables('vnet_name'), variables('subnet_name'))]"
+                            },
+                            "privateIPAllocationMethod": "Static",
+                            "privateIpAddress": "[variables('ip_address')]"
+                        }
+                    }
+                ]
+            },
+            "tags": "[variables('tags')]"
+        },
+        {
+            "name": "[variables('vm_name')]",
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2019-07-01",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces/', variables('nic_name'))]"
+            ],
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "Standard_B1s"
+                },
+                "storageProfile": {
+                    "osDisk": {
+                        "createOption": "fromImage",
+                        "managedDisk": {
+                            "storageAccountType": "Premium_LRS"
+                        }
+                    },
+                    "imageReference": {
+                        "publisher": "Canonical",
+                        "offer": "UbuntuServer",
+                        "sku": "18.04-LTS",
+                        "version": "latest"
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('nic_name'))]"
+                        }
+                    ]
+                },
+                "osProfile": {
+                    "computerName": "[variables('vm_name')]",
+                    "adminUsername": "[variables('username')]",
+                    "customData": "[base64(concat('#cloud-config\npackage_upgrade: true\npackages:\n  - iperf3\n'))]",
+                    "linuxConfiguration": {
+                        "disablePasswordAuthentication": true,
+                        "ssh": {
+                            "publicKeys": [
+                                {
+                                    "path": "[concat('/home/', variables('username'), '/.ssh/authorized_keys')]",
+                                    "keyData": "[variables('rsa_key')]"
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "tags": "[variables('tags')]"
+        }
+    ]
+}

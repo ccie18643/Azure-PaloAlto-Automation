@@ -1,0 +1,357 @@
+﻿{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "network_id": {
+            "type": "String",
+            "defaultValue": null
+        },
+        "site_id": {
+            "type": "string",
+            "defaultValue": null
+        },
+        "er_circuit_id": {
+            "type": "string",
+            "defaultValue": null
+        },
+        "er_auth_key": {
+            "type": "string",
+            "defaultValue": null
+        }
+    },
+    "variables": {
+        "network_id": "[parameters('network_id')]",
+        "site_id": "[parameters('site_id')]",
+        "er_circuit_id": "[parameters('er_circuit_id')]",
+        "er_auth_key": "[parameters('er_auth_key')]",
+        "tags": {"Department": "IT", "Project": "[concat(variables('site_id'), ' Azure Data Center')]", "Project Manager": "Sebastian Majewski"},
+
+        "rt_name_prefix": "[concat('RT_', variables('site_id'), '_10_', variables('network_id'))]",
+        "nsg_name_prefix": "[concat('NSG_', variables('site_id'), '_10_', variables('network_id'))]",
+        "subnet_name_prefix": "[concat('NET_10_', variables('network_id'))]",
+        "subnet_address_prefix": "[concat('10.', variables('network_id'))]",
+        "vnet_name": "[concat('VNET_', variables('site_id'), '_CORE')]",
+
+
+        "subnet_name_0": "GatewaySubnet",
+        "subnet_address_0": "[concat(variables('subnet_address_prefix'), '.0.0/27')]",
+        "subnet_rt_name_0": "[concat('RT_', variables('site_id'), '_GatewaySubnet')]",
+
+        "subnet_name_1": "[concat(variables('subnet_name_prefix'), '_0_32__28')]",
+        "subnet_address_1": "[concat(variables('subnet_address_prefix'), '.0.32/28')]",
+        "subnet_rt_name_1": "[concat(variables('rt_name_prefix'), '_0_32__28')]",
+
+        "subnet_name_2": "[concat(variables('subnet_name_prefix'), '_1_0__24')]",
+        "subnet_address_2": "[concat(variables('subnet_address_prefix'), '.1.0/24')]",
+        "subnet_rt_name_2": "[concat(variables('rt_name_prefix'), '_1_0__24')]",
+        "subnet_nsg_name_2": "[concat(variables('nsg_name_prefix'), '_1_0__24')]",
+
+        "subnet_name_3": "[concat(variables('subnet_name_prefix'), '_0_48__28')]",
+        "subnet_address_3": "[concat(variables('subnet_address_prefix'), '.0.48/28')]",
+        "subnet_rt_name_3": "[concat(variables('rt_name_prefix'), '_0_48__28')]",
+
+        "subnet_name_4": "[concat(variables('subnet_name_prefix'), '_0_64__28')]",
+        "subnet_address_4": "[concat(variables('subnet_address_prefix'), '.0.64/28')]",
+        "subnet_rt_name_4": "[concat(variables('rt_name_prefix'), '_0_64__28')]",
+
+        "subnet_name_5": "[concat(variables('subnet_name_prefix'), '_0_80__28')]",
+        "subnet_address_5": "[concat(variables('subnet_address_prefix'), '.0.80/28')]",
+        "subnet_rt_name_5": "[concat(variables('rt_name_prefix'), '_0_80__28')]",
+
+        "subnet_name_6": "[concat(variables('subnet_name_prefix'), '_0_96__28')]",
+        "subnet_address_6": "[concat(variables('subnet_address_prefix'), '.0.96/28')]",
+        "subnet_rt_name_6": "[concat(variables('rt_name_prefix'), '_0_96__28')]",
+
+        "subnet_name_7": "[concat(variables('subnet_name_prefix'), '_0_112__28')]",
+        "subnet_address_7": "[concat(variables('subnet_address_prefix'), '.0.112/28')]",
+        "subnet_rt_name_7": "[concat(variables('rt_name_prefix'), '_0_112__28')]",
+
+        "subnet_name_8": "[concat(variables('subnet_name_prefix'), '_0_128__28')]",
+        "subnet_address_8": "[concat(variables('subnet_address_prefix'), '.0.128/28')]",
+        "subnet_rt_name_8": "[concat(variables('rt_name_prefix'), '_0_128__28')]",
+
+        "subnet_name_9": "[concat(variables('subnet_name_prefix'), '_11_0__24')]",
+        "subnet_address_9": "[concat(variables('subnet_address_prefix'), '.11.0/24')]",
+        "subnet_rt_name_9": "[concat(variables('rt_name_prefix'), '_11_0__24')]",
+
+        "subnet_name_10": "[concat(variables('subnet_name_prefix'), '_127_0__24')]",
+        "subnet_address_10": "[concat(variables('subnet_address_prefix'), '.127.0/24')]",
+        "subnet_rt_name_10": "[concat(variables('rt_name_prefix'), '_127_0__24')]",
+
+        "subnet_name_11": "[concat(variables('subnet_name_prefix'), '_128_0__24')]",
+        "subnet_address_11": "[concat(variables('subnet_address_prefix'), '.128.0/24')]",
+        "subnet_rt_name_11": "[concat(variables('rt_name_prefix'), '_128_0__24')]",
+
+        "subnet_name_12": "[concat(variables('subnet_name_prefix'), '_129_0__24')]",
+        "subnet_address_12": "[concat(variables('subnet_address_prefix'), '.129.0/24')]",
+        "subnet_rt_name_12": "[concat(variables('rt_name_prefix'), '_129_0__24')]",
+
+        "subnet_name_13": "[concat(variables('subnet_name_prefix'), '_130_0__24')]",
+        "subnet_address_13": "[concat(variables('subnet_address_prefix'), '.130.0/24')]",
+        "subnet_rt_name_13": "[concat(variables('rt_name_prefix'), '_130_0__24')]",
+
+        "subnet_name_14": "[concat(variables('subnet_name_prefix'), '_255_0__24')]",
+        "subnet_address_14": "[concat(variables('subnet_address_prefix'), '.255.0/24')]",
+        "subnet_rt_name_14": "[concat(variables('rt_name_prefix'), '_255_0__24')]"
+    },
+    "resources": [
+        {
+            "apiVersion": "2018-10-01",
+            "type": "Microsoft.Network/virtualNetworks",
+            "name": "[variables('vnet_name')]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[concat(variables('subnet_address_prefix'), '.0.0/16')]"
+                    ]
+                }
+            },
+            "tags": "[variables('tags')]",
+            "resources": [
+                {
+                    "apiVersion": "2018-10-01",
+                    "type": "subnets",
+                    "location": "[resourceGroup().location]",
+                    "name": "[variables('subnet_name_0')]",
+                    "dependsOn": [
+                        "[variables('vnet_name')]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "[variables('subnet_address_0')]",
+                        "routeTable": {
+                            "id": "[resourceId('Microsoft.Network/routeTables', variables('subnet_rt_name_0'))]"
+                        }
+                    }
+                },
+                {
+                    "apiVersion": "2018-10-01",
+                    "type": "subnets",
+                    "location": "[resourceGroup().location]",
+                    "name": "[variables('subnet_name_1')]",
+                    "dependsOn": [
+                        "[variables('vnet_name')]",
+                        "[variables('subnet_name_0')]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "[variables('subnet_address_1')]",
+                        "routeTable": {
+                            "id": "[resourceId('Microsoft.Network/routeTables', variables('subnet_rt_name_1'))]"
+                        }
+                    }
+                },
+                {
+                    "apiVersion": "2018-10-01",
+                    "type": "subnets",
+                    "location": "[resourceGroup().location]",
+                    "name": "[variables('subnet_name_2')]",
+                    "dependsOn": [
+                        "[variables('vnet_name')]",
+                        "[variables('subnet_name_1')]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "[variables('subnet_address_2')]",
+                        "networkSecurityGroup": {
+                            "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('subnet_nsg_name_2'))]"
+                        },
+                        "routeTable": {
+                            "id": "[resourceId('Microsoft.Network/routeTables', variables('subnet_rt_name_2'))]"
+                        }
+                    }
+                },
+                {
+                    "apiVersion": "2018-10-01",
+                    "type": "subnets",
+                    "location": "[resourceGroup().location]",
+                    "name": "[variables('subnet_name_3')]",
+                    "dependsOn": [
+                        "[variables('vnet_name')]",
+                        "[variables('subnet_name_2')]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "[variables('subnet_address_3')]",
+                        "routeTable": {
+                            "id": "[resourceId('Microsoft.Network/routeTables', variables('subnet_rt_name_3'))]"
+                        }
+                    }
+                },
+                {
+                    "apiVersion": "2018-10-01",
+                    "type": "subnets",
+                    "location": "[resourceGroup().location]",
+                    "name": "[variables('subnet_name_4')]",
+                    "dependsOn": [
+                        "[variables('vnet_name')]",
+                        "[variables('subnet_name_3')]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "[variables('subnet_address_4')]",
+                        "routeTable": {
+                            "id": "[resourceId('Microsoft.Network/routeTables', variables('subnet_rt_name_4'))]"
+                        }
+                    }
+                },
+                {
+                    "apiVersion": "2018-10-01",
+                    "type": "subnets",
+                    "location": "[resourceGroup().location]",
+                    "name": "[variables('subnet_name_5')]",
+                    "dependsOn": [
+                        "[variables('vnet_name')]",
+                        "[variables('subnet_name_4')]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "[variables('subnet_address_5')]",
+                        "routeTable": {
+                            "id": "[resourceId('Microsoft.Network/routeTables', variables('subnet_rt_name_5'))]"
+                        }
+                    }
+                },
+                {
+                    "apiVersion": "2018-10-01",
+                    "type": "subnets",
+                    "location": "[resourceGroup().location]",
+                    "name": "[variables('subnet_name_6')]",
+                    "dependsOn": [
+                        "[variables('vnet_name')]",
+                        "[variables('subnet_name_5')]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "[variables('subnet_address_6')]",
+                        "routeTable": {
+                            "id": "[resourceId('Microsoft.Network/routeTables', variables('subnet_rt_name_6'))]"
+                        }
+                    }
+                },
+                {
+                    "apiVersion": "2018-10-01",
+                    "type": "subnets",
+                    "location": "[resourceGroup().location]",
+                    "name": "[variables('subnet_name_7')]",
+                    "dependsOn": [
+                        "[variables('vnet_name')]",
+                        "[variables('subnet_name_6')]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "[variables('subnet_address_7')]",
+                        "routeTable": {
+                            "id": "[resourceId('Microsoft.Network/routeTables', variables('subnet_rt_name_7'))]"
+                        }
+                    }
+                },
+                {
+                    "apiVersion": "2018-10-01",
+                    "type": "subnets",
+                    "location": "[resourceGroup().location]",
+                    "name": "[variables('subnet_name_8')]",
+                    "dependsOn": [
+                        "[variables('vnet_name')]",
+                        "[variables('subnet_name_7')]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "[variables('subnet_address_8')]",
+                        "routeTable": {
+                            "id": "[resourceId('Microsoft.Network/routeTables', variables('subnet_rt_name_8'))]"
+                        }
+                    }
+                },
+                {
+                    "apiVersion": "2018-10-01",
+                    "type": "subnets",
+                    "location": "[resourceGroup().location]",
+                    "name": "[variables('subnet_name_9')]",
+                    "dependsOn": [
+                        "[variables('vnet_name')]",
+                        "[variables('subnet_name_8')]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "[variables('subnet_address_9')]",
+                        "routeTable": {
+                            "id": "[resourceId('Microsoft.Network/routeTables', variables('subnet_rt_name_9'))]"
+                        }
+                    }
+                },
+                {
+                    "apiVersion": "2018-10-01",
+                    "type": "subnets",
+                    "location": "[resourceGroup().location]",
+                    "name": "[variables('subnet_name_10')]",
+                    "dependsOn": [
+                        "[variables('vnet_name')]",
+                        "[variables('subnet_name_9')]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "[variables('subnet_address_10')]",
+                        "routeTable": {
+                            "id": "[resourceId('Microsoft.Network/routeTables', variables('subnet_rt_name_10'))]"
+                        }
+                    }
+                },
+                {
+                    "apiVersion": "2018-10-01",
+                    "type": "subnets",
+                    "location": "[resourceGroup().location]",
+                    "name": "[variables('subnet_name_11')]",
+                    "dependsOn": [
+                        "[variables('vnet_name')]",
+                        "[variables('subnet_name_10')]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "[variables('subnet_address_11')]",
+                        "routeTable": {
+                            "id": "[resourceId('Microsoft.Network/routeTables', variables('subnet_rt_name_11'))]"
+                        }
+                    }
+                },
+                {
+                    "apiVersion": "2018-10-01",
+                    "type": "subnets",
+                    "location": "[resourceGroup().location]",
+                    "name": "[variables('subnet_name_12')]",
+                    "dependsOn": [
+                        "[variables('vnet_name')]",
+                        "[variables('subnet_name_11')]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "[variables('subnet_address_12')]",
+                        "routeTable": {
+                            "id": "[resourceId('Microsoft.Network/routeTables', variables('subnet_rt_name_12'))]"
+                        }
+                    }
+                },
+                {
+                    "apiVersion": "2018-10-01",
+                    "type": "subnets",
+                    "location": "[resourceGroup().location]",
+                    "name": "[variables('subnet_name_13')]",
+                    "dependsOn": [
+                        "[variables('vnet_name')]",
+                        "[variables('subnet_name_12')]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "[variables('subnet_address_13')]",
+                        "routeTable": {
+                            "id": "[resourceId('Microsoft.Network/routeTables', variables('subnet_rt_name_13'))]"
+                        }
+                    }
+                },
+                {
+                    "apiVersion": "2018-10-01",
+                    "type": "subnets",
+                    "location": "[resourceGroup().location]",
+                    "name": "[variables('subnet_name_14')]",
+                    "dependsOn": [
+                        "[variables('vnet_name')]",
+                        "[variables('subnet_name_13')]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "[variables('subnet_address_14')]",
+                        "routeTable": {
+                            "id": "[resourceId('Microsoft.Network/routeTables', variables('subnet_rt_name_14'))]"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

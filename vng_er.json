@@ -1,0 +1,104 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "network_id": {
+            "type": "String",
+            "defaultValue": null
+        },
+        "site_id": {
+            "type": "string",
+            "defaultValue": null
+        },
+        "er_circuit_id": {
+            "type": "string",
+            "defaultValue": null
+        },
+        "er_auth_key": {
+            "type": "string",
+            "defaultValue": null
+        }
+    },
+    "variables": {
+        "network_id": "[parameters('network_id')]",
+        "site_id": "[parameters('site_id')]",
+        "er_circuit_id": "[parameters('er_circuit_id')]",
+        "er_auth_key": "[parameters('er_auth_key')]",
+        "tags": {"Department": "IT", "Project": "[concat(variables('site_id'), ' Azure Data Center')]", "Project Manager": "Sebastian Majewski"},
+
+        "vnet_name": "[concat('VNET_', variables('site_id'), '_CORE')]",
+
+        "er_gateway_name": "[concat('VNG_', variables('site_id'), '_ER')]",
+        "er_ip_name": "[concat('IP_', variables('er_gateway_name'))]"
+    },
+
+    "resources": [
+        {
+            "apiVersion": "2019-02-01",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "[variables('er_ip_name')]",
+            "location": "[resourceGroup().location]",
+            "tags": "[variables('tags')]",
+            "properties": {
+                "publicIPAllocationMethod": "Dynamic"
+            }
+        },
+        {
+            "apiVersion": "2019-02-01",
+            "name": "[variables('er_gateway_name')]",
+            "type": "Microsoft.Network/virtualNetworkGateways",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses/', variables('er_ip_name'))]"
+            ],
+            "tags": "[variables('tags')]",
+            "properties": {
+                "gatewayType": "ExpressRoute",
+                "ipConfigurations": [
+                    {
+                        "name": "default",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnet_name'), 'GatewaySubnet')]"
+                            },
+                            "publicIpAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('er_ip_name'))]"
+                            }
+                        }
+                    }
+                ],
+                "sku": {
+                    "name": "Standard",
+                    "tier": "Standard"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Network/connections",
+            "apiVersion": "2019-09-01",
+            "name": "ER_SPRINT",
+            "location": "[resourceGroup().location]",
+            "tags": "[variables('tags')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworkGateways', variables('er_gateway_name'))]"
+            ],
+            "properties": {
+                "virtualNetworkGateway1": {
+                    "id": "[resourceId('Microsoft.Network/virtualNetworkGateways', variables('er_gateway_name'))]"
+                },
+                "connectionType": "ExpressRoute",
+                "routingWeight": 0,
+                "enableBgp": false,
+                "usePolicyBasedTrafficSelectors": false,
+                "ipsecPolicies": [],
+                "trafficSelectorPolicies": [],
+                "authorizationKey": "[variables('er_auth_key')]",
+                "peer": {
+                    "id": "[variables('er_circuit_id')]"
+                },
+                "expressRouteGatewayBypass": false
+            }
+        }
+    ]
+}

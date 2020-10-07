@@ -1,0 +1,992 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "network_id": {
+            "type": "String",
+            "defaultValue": null
+        },
+        "site_id": {
+            "type": "string",
+            "defaultValue": null
+        },
+        "er_circuit_id": {
+            "type": "string",
+            "defaultValue": null
+        },
+        "er_auth_key": {
+            "type": "string",
+            "defaultValue": null
+        }
+    },
+    "variables": {
+        "network_id": "[parameters('network_id')]",
+        "site_id": "[parameters('site_id')]",
+        "er_circuit_id": "[parameters('er_circuit_id')]",
+        "er_auth_key": "[parameters('er_auth_key')]",
+        "tags": {"Department": "IT", "Project": "[concat(variables('site_id'), ' Azure Data Center')]", "Project Manager": "Sebastian Majewski"},
+
+        "rt_name_prefix": "[concat('RT_', variables('site_id'), '_10_', variables('network_id'))]"
+    },
+    "resources": [
+        {   
+            "type": "Microsoft.Network/routeTables",
+            "apiVersion": "2019-09-01",
+            "name": "[concat('RT_', variables('site_id'), '_GatewaySubnet')]",
+            "location": "[resourceGroup().location]",
+            "tags": "[variables('tags')]",
+            "properties": {
+                "disableBgpRoutePropagation": false
+            },
+            "resources": [
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat('RT_', variables('site_id'), '_GatewaySubnet', '/', 'NET_10_', variables('network_id'), '_11_0__24')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat('RT_', variables('site_id'), '_GatewaySubnet'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "[concat('10.', variables('network_id'), '.11.0/24')]",
+                        "nextHopType": "VirtualAppliance",
+                        "nextHopIpAddress": "[concat('10.', variables('network_id'), '.0.52')]"
+                    }
+                },
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat('RT_', variables('site_id'), '_GatewaySubnet', '/', 'NET_10_', variables('network_id'), '_127_0__24')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat('RT_', variables('site_id'), '_GatewaySubnet'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "[concat('10.', variables('network_id'), '.127.0/24')]",
+                        "nextHopType": "VirtualAppliance",
+                        "nextHopIpAddress": "[concat('10.', variables('network_id'), '.0.52')]"
+                    }
+                },
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat('RT_', variables('site_id'), '_GatewaySubnet', '/', 'NET_10_', variables('network_id'), '_128_0__24')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat('RT_', variables('site_id'), '_GatewaySubnet'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "[concat('10.', variables('network_id'), '.128.0/24')]",
+                        "nextHopType": "VirtualAppliance",
+                        "nextHopIpAddress": "[concat('10.', variables('network_id'), '.0.52')]"
+                    }
+                },
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat('RT_', variables('site_id'), '_GatewaySubnet', '/', 'NET_10_', variables('network_id'), '_129_0__24')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat('RT_', variables('site_id'), '_GatewaySubnet'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "[concat('10.', variables('network_id'), '.129.0/24')]",
+                        "nextHopType": "VirtualAppliance",
+                        "nextHopIpAddress": "[concat('10.', variables('network_id'), '.0.52')]"
+                    }
+                },
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat('RT_', variables('site_id'), '_GatewaySubnet', '/', 'NET_10_', variables('network_id'), '_130_0__24')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat('RT_', variables('site_id'), '_GatewaySubnet'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "[concat('10.', variables('network_id'), '.130.0/24')]",
+                        "nextHopType": "VirtualAppliance",
+                        "nextHopIpAddress": "[concat('10.', variables('network_id'), '.0.52')]"
+                    }
+                },
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat('RT_', variables('site_id'), '_GatewaySubnet', '/', 'NET_10_', variables('network_id'), '_255_0__24')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat('RT_', variables('site_id'), '_GatewaySubnet'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "[concat('10.', variables('network_id'), '.255.0/24')]",
+                        "nextHopType": "VirtualAppliance",
+                        "nextHopIpAddress": "[concat('10.', variables('network_id'), '.0.52')]"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "Microsoft.Network/routeTables",
+            "apiVersion": "2019-09-01",
+            "name": "[concat(variables('rt_name_prefix'),  '_0_32__28')]",
+            "location": "[resourceGroup().location]",
+            "tags": "[variables('tags')]",
+            "properties": {
+                "disableBgpRoutePropagation": false
+            }
+        },
+        {
+            "type": "Microsoft.Network/routeTables",
+            "apiVersion": "2019-09-01",
+            "name": "[concat(variables('rt_name_prefix'),  '_1_0__24')]",
+            "location": "[resourceGroup().location]",
+            "tags": "[variables('tags')]",
+            "properties": {
+                "disableBgpRoutePropagation": true
+            },
+            "resources": [
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat(variables('rt_name_prefix'),  '_1_0__24', '/', 'NET_10_', variables('network_id'), '_0_0__16')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat(variables('rt_name_prefix'),  '_1_0__24'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "[concat('10.', variables('network_id'), '.0.0/16')]",
+                        "nextHopType": "None"
+                    }
+                },
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat(variables('rt_name_prefix'),  '_1_0__24', '/', 'NET_10_0_0_0__8')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat(variables('rt_name_prefix'),  '_1_0__24'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "10.0.0.0/8",
+                        "nextHopType": "None"
+                    }
+                },
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat(variables('rt_name_prefix'),  '_1_0__24', '/', 'NET_0_0_0_0__0')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat(variables('rt_name_prefix'),  '_1_0__24'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "0.0.0.0/0",
+                        "nextHopType": "Internet"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "Microsoft.Network/routeTables",
+            "apiVersion": "2019-09-01",
+            "name": "[concat(variables('rt_name_prefix'),  '_0_48__28')]",
+            "location": "[resourceGroup().location]",
+            "tags": "[variables('tags')]",
+            "properties": {
+                "disableBgpRoutePropagation": false
+            },
+            "resources": [
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat(variables('rt_name_prefix'),  '_0_48__28', '/', 'NET_10_', variables('network_id'), '_0_48__28')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat(variables('rt_name_prefix'),  '_0_48__28'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "[concat('10.', variables('network_id'), '.0.48/28')]",
+                        "nextHopType": "VnetLocal"
+                    }
+                },
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat(variables('rt_name_prefix'),  '_0_48__28', '/', 'NET_10_', variables('network_id'), '_0_0__16')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat(variables('rt_name_prefix'),  '_0_48__28'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "[concat('10.', variables('network_id'), '.0.0/16')]",
+                        "nextHopType": "VirtualAppliance",
+                        "nextHopIpAddress": "[concat('10.', variables('network_id'), '.0.52')]"
+                    }
+                },
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat(variables('rt_name_prefix'),  '_0_48__28', '/', 'NET_0_0_0_0__0')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat(variables('rt_name_prefix'),  '_0_48__28'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "0.0.0.0/0",
+                        "nextHopType": "None"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "Microsoft.Network/routeTables",
+            "apiVersion": "2019-09-01",
+            "name": "[concat(variables('rt_name_prefix'),  '_0_64__28')]",
+            "location": "[resourceGroup().location]",
+            "tags": "[variables('tags')]",
+            "properties": {
+                "disableBgpRoutePropagation": true
+            },
+            "resources": [
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat(variables('rt_name_prefix'),  '_0_64__28', '/', 'NET_10_', variables('network_id'), '_11_0__24')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat(variables('rt_name_prefix'),  '_0_64__28'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "[concat('10.', variables('network_id'), '.11.0/24')]",
+                        "nextHopType": "VnetLocal"
+                    }
+                },
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat(variables('rt_name_prefix'),  '_0_64__28', '/', 'NET_10_', variables('network_id'), '_0_64__28')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat(variables('rt_name_prefix'),  '_0_64__28'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "[concat('10.', variables('network_id'), '.0.64/28')]",
+                        "nextHopType": "VnetLocal"
+                    }
+                },
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat(variables('rt_name_prefix'),  '_0_64__28', '/', 'NET_10_', variables('network_id'), '_0_0__16')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat(variables('rt_name_prefix'),  '_0_64__28'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "[concat('10.', variables('network_id'), '.0.0/16')]",
+                        "nextHopType": "VirtualAppliance",
+                        "nextHopIpAddress": "[concat('10.', variables('network_id'), '.0.68')]"
+                    }
+                },
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat(variables('rt_name_prefix'),  '_0_64__28', '/', 'NET_10_0_0_0__8')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat(variables('rt_name_prefix'),  '_0_64__28'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "10.0.0.0/8",
+                        "nextHopType": "VirtualAppliance",
+                        "nextHopIpAddress": "[concat('10.', variables('network_id'), '.0.68')]"
+                    }
+                },
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat(variables('rt_name_prefix'),  '_0_64__28', '/', 'NET_0_0_0_0__0')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat(variables('rt_name_prefix'),  '_0_64__28'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "0.0.0.0/0",
+                        "nextHopType": "VirtualAppliance",
+                        "nextHopIpAddress": "[concat('10.', variables('network_id'), '.0.68')]"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "Microsoft.Network/routeTables",
+            "apiVersion": "2019-09-01",
+            "name": "[concat(variables('rt_name_prefix'),  '_0_80__28')]",
+            "location": "[resourceGroup().location]",
+            "tags": "[variables('tags')]",
+            "properties": {
+                "disableBgpRoutePropagation": true
+            },
+            "resources": [
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat(variables('rt_name_prefix'),  '_0_80__28', '/', 'NET_10_', variables('network_id'), '_127_0__24')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat(variables('rt_name_prefix'),  '_0_80__28'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "[concat('10.', variables('network_id'), '.127.0/24')]",
+                        "nextHopType": "VnetLocal"
+                    }
+                },
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat(variables('rt_name_prefix'),  '_0_80__28', '/', 'NET_10_', variables('network_id'), '_128_0__24')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat(variables('rt_name_prefix'),  '_0_80__28'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "[concat('10.', variables('network_id'), '.128.0/24')]",
+                        "nextHopType": "VnetLocal"
+                    }
+                },
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat(variables('rt_name_prefix'),  '_0_80__28', '/', 'NET_10_', variables('network_id'), '_0_80__28')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat(variables('rt_name_prefix'),  '_0_80__28'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "[concat('10.', variables('network_id'), '.0.80/28')]",
+                        "nextHopType": "VnetLocal"
+                    }
+                },
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat(variables('rt_name_prefix'),  '_0_80__28', '/', 'NET_10_', variables('network_id'), '_0_0__16')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat(variables('rt_name_prefix'),  '_0_80__28'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "[concat('10.', variables('network_id'), '.0.0/16')]",
+                        "nextHopType": "VirtualAppliance",
+                        "nextHopIpAddress": "[concat('10.', variables('network_id'), '.0.84')]"
+                    }
+                },
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat(variables('rt_name_prefix'),  '_0_80__28', '/', 'NET_10_0_0_0__8')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat(variables('rt_name_prefix'),  '_0_80__28'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "10.0.0.0/8",
+                        "nextHopType": "VirtualAppliance",
+                        "nextHopIpAddress": "[concat('10.', variables('network_id'), '.0.84')]"
+                    }
+                },
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat(variables('rt_name_prefix'),  '_0_80__28', '/', 'NET_0_0_0_0__0')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat(variables('rt_name_prefix'),  '_0_80__28'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "0.0.0.0/0",
+                        "nextHopType": "VirtualAppliance",
+                        "nextHopIpAddress": "[concat('10.', variables('network_id'), '.0.84')]"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "Microsoft.Network/routeTables",
+            "apiVersion": "2019-09-01",
+            "name": "[concat(variables('rt_name_prefix'),  '_0_96__28')]",
+            "location": "[resourceGroup().location]",
+            "tags": "[variables('tags')]",
+            "properties": {
+                "disableBgpRoutePropagation": true
+            },
+            "resources": [
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat(variables('rt_name_prefix'),  '_0_96__28', '/', 'NET_10_', variables('network_id'), '_129_0__24')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat(variables('rt_name_prefix'),  '_0_96__28'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "[concat('10.', variables('network_id'), '.129.0/24')]",
+                        "nextHopType": "VnetLocal"
+                    }
+                },
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat(variables('rt_name_prefix'),  '_0_96__28', '/', 'NET_10_', variables('network_id'), '_130_0__24')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat(variables('rt_name_prefix'),  '_0_96__28'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "[concat('10.', variables('network_id'), '.130.0/24')]",
+                        "nextHopType": "VnetLocal"
+                    }
+                },
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat(variables('rt_name_prefix'),  '_0_96__28', '/', 'NET_10_', variables('network_id'), '_0_96__28')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat(variables('rt_name_prefix'),  '_0_96__28'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "[concat('10.', variables('network_id'), '.0.96/28')]",
+                        "nextHopType": "VnetLocal"
+                    }
+                },
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat(variables('rt_name_prefix'),  '_0_96__28', '/', 'NET_10_', variables('network_id'), '_0_0__16')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat(variables('rt_name_prefix'),  '_0_96__28'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "[concat('10.', variables('network_id'), '.0.0/16')]",
+                        "nextHopType": "VirtualAppliance",
+                        "nextHopIpAddress": "[concat('10.', variables('network_id'), '.0.100')]"
+                    }
+                },
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat(variables('rt_name_prefix'),  '_0_96__28', '/', 'NET_10_0_0_0__8')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat(variables('rt_name_prefix'),  '_0_96__28'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "10.0.0.0/8",
+                        "nextHopType": "VirtualAppliance",
+                        "nextHopIpAddress": "[concat('10.', variables('network_id'), '.0.100')]"
+                    }
+                },
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat(variables('rt_name_prefix'),  '_0_96__28', '/', 'NET_0_0_0_0__0')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat(variables('rt_name_prefix'),  '_0_96__28'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "0.0.0.0/0",
+                        "nextHopType": "VirtualAppliance",
+                        "nextHopIpAddress": "[concat('10.', variables('network_id'), '.0.100')]"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "Microsoft.Network/routeTables",
+            "apiVersion": "2019-09-01",
+            "name": "[concat(variables('rt_name_prefix'),  '_0_112__28')]",
+            "location": "[resourceGroup().location]",
+            "tags": "[variables('tags')]",
+            "properties": {
+                "disableBgpRoutePropagation": true
+            },
+            "resources": [
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat(variables('rt_name_prefix'),  '_0_112__28', '/', 'NET_10_', variables('network_id'), '_255_0__24')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat(variables('rt_name_prefix'),  '_0_112__28'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "[concat('10.', variables('network_id'), '.255.0/24')]",
+                        "nextHopType": "VnetLocal"
+                    }
+                },
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat(variables('rt_name_prefix'),  '_0_112__28', '/', 'NET_10_', variables('network_id'), '_0_112__28')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat(variables('rt_name_prefix'),  '_0_112__28'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "[concat('10.', variables('network_id'), '.0.112/28')]",
+                        "nextHopType": "VnetLocal"
+                    }
+                },
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat(variables('rt_name_prefix'),  '_0_112__28', '/', 'NET_10_', variables('network_id'), '_0_0__16')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat(variables('rt_name_prefix'),  '_0_112__28'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "[concat('10.', variables('network_id'), '.0.0/16')]",
+                        "nextHopType": "VirtualAppliance",
+                        "nextHopIpAddress": "[concat('10.', variables('network_id'), '.0.116')]"
+                    }
+                },
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat(variables('rt_name_prefix'),  '_0_112__28', '/', 'NET_10_0_0_0__8')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat(variables('rt_name_prefix'),  '_0_112__28'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "10.0.0.0/8",
+                        "nextHopType": "VirtualAppliance",
+                        "nextHopIpAddress": "[concat('10.', variables('network_id'), '.0.116')]"
+                    }
+                },
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat(variables('rt_name_prefix'),  '_0_112__28', '/', 'NET_0_0_0_0__0')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat(variables('rt_name_prefix'),  '_0_112__28'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "0.0.0.0/0",
+                        "nextHopType": "VirtualAppliance",
+                        "nextHopIpAddress": "[concat('10.', variables('network_id'), '.0.116')]"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "Microsoft.Network/routeTables",
+            "apiVersion": "2019-09-01",
+            "name": "[concat(variables('rt_name_prefix'),  '_0_128__28')]",
+            "location": "[resourceGroup().location]",
+            "tags": "[variables('tags')]",
+            "properties": {
+                "disableBgpRoutePropagation": true
+            },
+            "resources": [
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat(variables('rt_name_prefix'),  '_0_128__28', '/', 'NET_10_', variables('network_id'), '_0_128__28')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat(variables('rt_name_prefix'),  '_0_128__28'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "[concat('10.', variables('network_id'), '.0.128/28')]",
+                        "nextHopType": "VnetLocal"
+                    }
+                },
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat(variables('rt_name_prefix'),  '_0_128__28', '/', 'NET_10_', variables('network_id'), '_0_0__16')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat(variables('rt_name_prefix'),  '_0_128__28'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "[concat('10.', variables('network_id'), '.0.0/16')]",
+                        "nextHopType": "None"
+                    }
+                },
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat(variables('rt_name_prefix'),  '_0_128__28', '/', 'NET_10_0_0_0__8')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat(variables('rt_name_prefix'),  '_0_128__28'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "10.0.0.0/8",
+                        "nextHopType": "None"
+                    }
+                },
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat(variables('rt_name_prefix'),  '_0_128__28', '/', 'NET_0_0_0_0__0')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat(variables('rt_name_prefix'),  '_0_128__28'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "0.0.0.0/0",
+                        "nextHopType": "None"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "Microsoft.Network/routeTables",
+            "apiVersion": "2019-09-01",
+            "name": "[concat(variables('rt_name_prefix'), '_11_0__24')]",
+            "location": "[resourceGroup().location]",
+            "tags": "[variables('tags')]",
+            "properties": {
+                "disableBgpRoutePropagation": true
+            },
+            "resources": [
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat(variables('rt_name_prefix'), '_11_0__24', '/', 'NET_10_', variables('network_id'), '_11_0__24')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat(variables('rt_name_prefix'), '_11_0__24'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "[concat('10.', variables('network_id'), '.11.0/24')]",
+                        "nextHopType": "VnetLocal"
+                    }
+                },
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat(variables('rt_name_prefix'), '_11_0__24', '/', 'NET_10_', variables('network_id'), '_0_0__16')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat(variables('rt_name_prefix'), '_11_0__24'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "[concat('10.', variables('network_id'), '.0.0/16')]",
+                        "nextHopType": "VirtualAppliance",
+                        "nextHopIpAddress": "[concat('10.', variables('network_id'), '.0.68')]"
+                    }
+                },
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat(variables('rt_name_prefix'), '_11_0__24', '/', 'NET_10_0_0_0__8')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat(variables('rt_name_prefix'), '_11_0__24'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "10.0.0.0/8",
+                        "nextHopType": "VirtualAppliance",
+                        "nextHopIpAddress": "[concat('10.', variables('network_id'), '.0.68')]"
+                    }
+                },
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat(variables('rt_name_prefix'), '_11_0__24', '/', 'NET_0_0_0_0__0')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat(variables('rt_name_prefix'), '_11_0__24'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "0.0.0.0/0",
+                        "nextHopType": "VirtualAppliance",
+                        "nextHopIpAddress": "[concat('10.', variables('network_id'), '.0.68')]"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "Microsoft.Network/routeTables",
+            "apiVersion": "2019-09-01",
+            "name": "[concat(variables('rt_name_prefix'), '_127_0__24')]",
+            "location": "[resourceGroup().location]",
+            "tags": "[variables('tags')]",
+            "properties": {
+                "disableBgpRoutePropagation": true
+            },
+            "resources": [
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat(variables('rt_name_prefix'), '_127_0__24', '/', 'NET_10_', variables('network_id'), '_127_0__24')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat(variables('rt_name_prefix'), '_127_0__24'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "[concat('10.', variables('network_id'), '.127.0/24')]",
+                        "nextHopType": "VnetLocal"
+                    }
+                },
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat(variables('rt_name_prefix'), '_127_0__24', '/', 'NET_10_', variables('network_id'), '_0_0__16')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat(variables('rt_name_prefix'), '_127_0__24'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "[concat('10.', variables('network_id'), '.0.0/16')]",
+                        "nextHopType": "VirtualAppliance",
+                        "nextHopIpAddress": "[concat('10.', variables('network_id'), '.0.84')]"
+                    }
+                },
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat(variables('rt_name_prefix'), '_127_0__24', '/', 'NET_10_0_0_0__8')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat(variables('rt_name_prefix'), '_127_0__24'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "10.0.0.0/8",
+                        "nextHopType": "VirtualAppliance",
+                        "nextHopIpAddress": "[concat('10.', variables('network_id'), '.0.84')]"
+                    }
+                },
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat(variables('rt_name_prefix'), '_127_0__24', '/', 'NET_0_0_0_0__0')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat(variables('rt_name_prefix'), '_127_0__24'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "0.0.0.0/0",
+                        "nextHopType": "VirtualAppliance",
+                        "nextHopIpAddress": "[concat('10.', variables('network_id'), '.0.84')]"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "Microsoft.Network/routeTables",
+            "apiVersion": "2019-09-01",
+            "name": "[concat(variables('rt_name_prefix'), '_128_0__24')]",
+            "location": "[resourceGroup().location]",
+            "tags": "[variables('tags')]",
+            "properties": {
+                "disableBgpRoutePropagation": true
+            },
+            "resources": [
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat(variables('rt_name_prefix'), '_128_0__24', '/', 'NET_10_', variables('network_id'), '_128_0__24')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat(variables('rt_name_prefix'), '_128_0__24'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "[concat('10.', variables('network_id'), '.128.0/24')]",
+                        "nextHopType": "VnetLocal"
+                    }
+                },
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat(variables('rt_name_prefix'), '_128_0__24', '/', 'NET_10_', variables('network_id'), '_0_0__16')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat(variables('rt_name_prefix'), '_128_0__24'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "[concat('10.', variables('network_id'), '.0.0/16')]",
+                        "nextHopType": "VirtualAppliance",
+                        "nextHopIpAddress": "[concat('10.', variables('network_id'), '.0.84')]"
+                    }
+                },
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat(variables('rt_name_prefix'), '_128_0__24', '/', 'NET_10_0_0_0__8')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat(variables('rt_name_prefix'), '_128_0__24'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "10.0.0.0/8",
+                        "nextHopType": "VirtualAppliance",
+                        "nextHopIpAddress": "[concat('10.', variables('network_id'), '.0.84')]"
+                    }
+                },
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat(variables('rt_name_prefix'), '_128_0__24', '/', 'NET_0_0_0_0__0')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat(variables('rt_name_prefix'), '_128_0__24'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "0.0.0.0/0",
+                        "nextHopType": "VirtualAppliance",
+                        "nextHopIpAddress": "[concat('10.', variables('network_id'), '.0.84')]"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "Microsoft.Network/routeTables",
+            "apiVersion": "2019-09-01",
+            "name": "[concat(variables('rt_name_prefix'), '_129_0__24')]",
+            "location": "[resourceGroup().location]",
+            "tags": "[variables('tags')]",
+            "properties": {
+                "disableBgpRoutePropagation": true
+            },
+            "resources": [
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat(variables('rt_name_prefix'), '_129_0__24', '/', 'NET_10_', variables('network_id'), '_129_0__24')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat(variables('rt_name_prefix'), '_129_0__24'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "[concat('10.', variables('network_id'), '.129.0/24')]",
+                        "nextHopType": "VnetLocal"
+                    }
+                },
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat(variables('rt_name_prefix'), '_129_0__24', '/', 'NET_10_', variables('network_id'), '_0_0__16')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat(variables('rt_name_prefix'), '_129_0__24'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "[concat('10.', variables('network_id'), '.0.0/16')]",
+                        "nextHopType": "VirtualAppliance",
+                        "nextHopIpAddress": "[concat('10.', variables('network_id'), '.0.100')]"
+                    }
+                },
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat(variables('rt_name_prefix'), '_129_0__24', '/', 'NET_10_0_0_0__8')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat(variables('rt_name_prefix'), '_129_0__24'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "10.0.0.0/8",
+                        "nextHopType": "VirtualAppliance",
+                        "nextHopIpAddress": "[concat('10.', variables('network_id'), '.0.100')]"
+                    }
+                },
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat(variables('rt_name_prefix'), '_129_0__24', '/', 'NET_0_0_0_0__0')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat(variables('rt_name_prefix'), '_129_0__24'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "0.0.0.0/0",
+                        "nextHopType": "VirtualAppliance",
+                        "nextHopIpAddress": "[concat('10.', variables('network_id'), '.0.100')]"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "Microsoft.Network/routeTables",
+            "apiVersion": "2019-09-01",
+            "name": "[concat(variables('rt_name_prefix'), '_130_0__24')]",
+            "location": "[resourceGroup().location]",
+            "tags": "[variables('tags')]",
+            "properties": {
+                "disableBgpRoutePropagation": true
+            },
+            "resources": [
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat(variables('rt_name_prefix'), '_130_0__24', '/', 'NET_10_', variables('network_id'), '_130_0__24')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat(variables('rt_name_prefix'), '_130_0__24'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "[concat('10.', variables('network_id'), '.130.0/24')]",
+                        "nextHopType": "VnetLocal"
+                    }
+                },
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat(variables('rt_name_prefix'), '_130_0__24', '/', 'NET_10_', variables('network_id'), '_0_0__16')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat(variables('rt_name_prefix'), '_130_0__24'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "[concat('10.', variables('network_id'), '.0.0/16')]",
+                        "nextHopType": "VirtualAppliance",
+                        "nextHopIpAddress": "[concat('10.', variables('network_id'), '.0.100')]"
+                    }
+                },
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat(variables('rt_name_prefix'), '_130_0__24', '/', 'NET_10_0_0_0__8')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat(variables('rt_name_prefix'), '_130_0__24'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "10.0.0.0/8",
+                        "nextHopType": "VirtualAppliance",
+                        "nextHopIpAddress": "[concat('10.', variables('network_id'), '.0.100')]"
+                    }
+                },
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat(variables('rt_name_prefix'), '_130_0__24', '/', 'NET_0_0_0_0__0')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat(variables('rt_name_prefix'), '_130_0__24'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "0.0.0.0/0",
+                        "nextHopType": "VirtualAppliance",
+                        "nextHopIpAddress": "[concat('10.', variables('network_id'), '.0.100')]"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "Microsoft.Network/routeTables",
+            "apiVersion": "2019-09-01",
+            "name": "[concat(variables('rt_name_prefix'), '_255_0__24')]",
+            "location": "[resourceGroup().location]",
+            "tags": "[variables('tags')]",
+            "properties": {
+                "disableBgpRoutePropagation": true
+            },
+            "resources": [
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat(variables('rt_name_prefix'), '_255_0__24', '/', 'NET_10_', variables('network_id'), '_255_0__24')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat(variables('rt_name_prefix'), '_255_0__24'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "[concat('10.', variables('network_id'), '.255.0/24')]",
+                        "nextHopType": "VnetLocal"
+                    }
+                },
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat(variables('rt_name_prefix'), '_255_0__24', '/', 'NET_10_', variables('network_id'), '_0_0__16')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat(variables('rt_name_prefix'), '_255_0__24'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "[concat('10.', variables('network_id'), '.0.0/16')]",
+                        "nextHopType": "VirtualAppliance",
+                        "nextHopIpAddress": "[concat('10.', variables('network_id'), '.0.116')]"
+                    }
+                },
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat(variables('rt_name_prefix'), '_255_0__24', '/', 'NET_10_0_0_0__8')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat(variables('rt_name_prefix'), '_255_0__24'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "10.0.0.0/8",
+                        "nextHopType": "VirtualAppliance",
+                        "nextHopIpAddress": "[concat('10.', variables('network_id'), '.0.116')]"
+                    }
+                },
+                {
+                    "type": "Microsoft.Network/routeTables/routes",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat(variables('rt_name_prefix'), '_255_0__24', '/', 'NET_0_0_0_0__0')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/routeTables', concat(variables('rt_name_prefix'), '_255_0__24'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "0.0.0.0/0",
+                        "nextHopType": "VirtualAppliance",
+                        "nextHopIpAddress": "[concat('10.', variables('network_id'), '.0.116')]"
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,201 @@
+set deviceconfig system timezone US/Eastern
+
+set network interface ethernet ethernet1/1 layer3 ipv6 neighbor-discovery router-advertisement enable no
+set network interface ethernet ethernet1/1 layer3 ndp-proxy enabled no
+set network interface ethernet ethernet1/1 layer3 lldp enable no
+set network interface ethernet ethernet1/1 layer3 interface-management-profile IMP_PING
+set network interface ethernet ethernet1/1 layer3 ip 10.1.1.5/32 
+set network interface ethernet ethernet1/1 layer3 ip 10.1.1.6/32 
+set network interface ethernet ethernet1/1 layer3 ip 10.1.1.4/24 
+set network interface ethernet ethernet1/1 link-state auto
+set network interface ethernet ethernet1/2 layer3 ipv6 neighbor-discovery router-advertisement enable no
+set network interface ethernet ethernet1/2 layer3 ndp-proxy enabled no
+set network interface ethernet ethernet1/2 layer3 lldp enable no
+set network interface ethernet ethernet1/2 layer3 ip 10.1.0.53/32 
+set network interface ethernet ethernet1/2 layer3 ip 10.1.0.54/32 
+set network interface ethernet ethernet1/2 layer3 ip 10.1.0.52/28 
+set network interface ethernet ethernet1/3 layer3 ipv6 neighbor-discovery router-advertisement enable no
+set network interface ethernet ethernet1/3 layer3 ndp-proxy enabled no
+set network interface ethernet ethernet1/3 layer3 lldp enable no
+set network interface ethernet ethernet1/3 layer3 ip 10.1.0.69/32 
+set network interface ethernet ethernet1/3 layer3 ip 10.1.0.70/32 
+set network interface ethernet ethernet1/3 layer3 ip 10.1.0.68/28 
+set network interface ethernet ethernet1/4 layer3 ipv6 neighbor-discovery router-advertisement enable no
+set network interface ethernet ethernet1/4 layer3 ndp-proxy enabled no
+set network interface ethernet ethernet1/4 layer3 lldp enable no
+set network interface ethernet ethernet1/4 layer3 ip 10.1.0.85/32 
+set network interface ethernet ethernet1/4 layer3 ip 10.1.0.86/32 
+set network interface ethernet ethernet1/4 layer3 ip 10.1.0.84/28 
+set network interface ethernet ethernet1/5 layer3 ipv6 neighbor-discovery router-advertisement enable no
+set network interface ethernet ethernet1/5 layer3 ndp-proxy enabled no
+set network interface ethernet ethernet1/5 layer3 lldp enable no
+set network interface ethernet ethernet1/5 layer3 ip 10.1.0.101/32 
+set network interface ethernet ethernet1/5 layer3 ip 10.1.0.102/32 
+set network interface ethernet ethernet1/5 layer3 ip 10.1.0.100/28 
+set network interface ethernet ethernet1/6 layer3 ipv6 neighbor-discovery router-advertisement enable no
+set network interface ethernet ethernet1/6 layer3 ndp-proxy enabled no
+set network interface ethernet ethernet1/6 layer3 lldp enable no
+set network interface ethernet ethernet1/6 layer3 ip 10.1.0.117/32 
+set network interface ethernet ethernet1/6 layer3 ip 10.1.0.118/32 
+set network interface ethernet ethernet1/6 layer3 ip 10.1.0.116/28 
+set network interface ethernet ethernet1/7 ha
+
+rename network virtual-router default to LAB
+set network virtual-router LAB protocol bgp enable no
+set network virtual-router LAB protocol bgp dampening-profile default cutoff 1.25
+set network virtual-router LAB protocol bgp dampening-profile default reuse 0.5
+set network virtual-router LAB protocol bgp dampening-profile default max-hold-time 900
+set network virtual-router LAB protocol bgp dampening-profile default decay-half-life-reachable 300
+set network virtual-router LAB protocol bgp dampening-profile default decay-half-life-unreachable 900
+set network virtual-router LAB protocol bgp dampening-profile default enable yes
+set network virtual-router LAB protocol bgp routing-options graceful-restart enable yes
+set network virtual-router LAB protocol rip enable no
+set network virtual-router LAB protocol ospf enable no
+set network virtual-router LAB protocol ospfv3 enable no
+set network virtual-router LAB ecmp algorithm ip-modulo 
+set network virtual-router LAB interface [ ethernet1/1 ethernet1/2 ethernet1/3 ethernet1/4 ethernet1/5 ethernet1/6 ]
+set network virtual-router LAB routing-table ip static-route SR_0.0.0.0_0 nexthop ip-address 10.1.1.1
+set network virtual-router LAB routing-table ip static-route SR_0.0.0.0_0 bfd profile None
+set network virtual-router LAB routing-table ip static-route SR_0.0.0.0_0 path-monitor enable no
+set network virtual-router LAB routing-table ip static-route SR_0.0.0.0_0 path-monitor failure-condition any
+set network virtual-router LAB routing-table ip static-route SR_0.0.0.0_0 path-monitor hold-time 2
+set network virtual-router LAB routing-table ip static-route SR_0.0.0.0_0 interface ethernet1/1
+set network virtual-router LAB routing-table ip static-route SR_0.0.0.0_0 metric 10
+set network virtual-router LAB routing-table ip static-route SR_0.0.0.0_0 destination 0.0.0.0/0
+set network virtual-router LAB routing-table ip static-route SR_0.0.0.0_0 route-table unicast
+set network virtual-router LAB routing-table ip static-route SR_10.0.0.0_8 nexthop ip-address 10.1.0.49
+set network virtual-router LAB routing-table ip static-route SR_10.0.0.0_8 bfd profile None
+set network virtual-router LAB routing-table ip static-route SR_10.0.0.0_8 path-monitor enable no
+set network virtual-router LAB routing-table ip static-route SR_10.0.0.0_8 path-monitor failure-condition any
+set network virtual-router LAB routing-table ip static-route SR_10.0.0.0_8 path-monitor hold-time 2
+set network virtual-router LAB routing-table ip static-route SR_10.0.0.0_8 interface ethernet1/2
+set network virtual-router LAB routing-table ip static-route SR_10.0.0.0_8 metric 10
+set network virtual-router LAB routing-table ip static-route SR_10.0.0.0_8 destination 10.0.0.0/8
+set network virtual-router LAB routing-table ip static-route SR_10.0.0.0_8 route-table unicast 
+set network virtual-router LAB routing-table ip static-route SR_10.1.11.0_24 nexthop ip-address 10.1.0.65
+set network virtual-router LAB routing-table ip static-route SR_10.1.11.0_24 bfd profile None
+set network virtual-router LAB routing-table ip static-route SR_10.1.11.0_24 path-monitor enable no
+set network virtual-router LAB routing-table ip static-route SR_10.1.11.0_24 path-monitor failure-condition any
+set network virtual-router LAB routing-table ip static-route SR_10.1.11.0_24 path-monitor hold-time 2
+set network virtual-router LAB routing-table ip static-route SR_10.1.11.0_24 interface ethernet1/3
+set network virtual-router LAB routing-table ip static-route SR_10.1.11.0_24 metric 10
+set network virtual-router LAB routing-table ip static-route SR_10.1.11.0_24 destination 10.1.11.0/24
+set network virtual-router LAB routing-table ip static-route SR_10.1.11.0_24 route-table unicast 
+set network virtual-router LAB routing-table ip static-route SR_10.1.32.0_24 nexthop ip-address 10.1.0.113
+set network virtual-router LAB routing-table ip static-route SR_10.1.32.0_24 bfd profile None
+set network virtual-router LAB routing-table ip static-route SR_10.1.32.0_24 path-monitor enable no
+set network virtual-router LAB routing-table ip static-route SR_10.1.32.0_24 path-monitor failure-condition any
+set network virtual-router LAB routing-table ip static-route SR_10.1.32.0_24 path-monitor hold-time 2
+set network virtual-router LAB routing-table ip static-route SR_10.1.32.0_24 interface ethernet1/6
+set network virtual-router LAB routing-table ip static-route SR_10.1.32.0_24 metric 10
+set network virtual-router LAB routing-table ip static-route SR_10.1.32.0_24 destination 10.1.32.0/24
+set network virtual-router LAB routing-table ip static-route SR_10.1.32.0_24 route-table unicast 
+set network virtual-router LAB routing-table ip static-route SR_10.1.127.0_24 nexthop ip-address 10.1.0.81
+set network virtual-router LAB routing-table ip static-route SR_10.1.127.0_24 bfd profile None
+set network virtual-router LAB routing-table ip static-route SR_10.1.127.0_24 path-monitor enable no
+set network virtual-router LAB routing-table ip static-route SR_10.1.127.0_24 path-monitor failure-condition any
+set network virtual-router LAB routing-table ip static-route SR_10.1.127.0_24 path-monitor hold-time 2
+set network virtual-router LAB routing-table ip static-route SR_10.1.127.0_24 interface ethernet1/4
+set network virtual-router LAB routing-table ip static-route SR_10.1.127.0_24 metric 10
+set network virtual-router LAB routing-table ip static-route SR_10.1.127.0_24 destination 10.1.127.0/24
+set network virtual-router LAB routing-table ip static-route SR_10.1.127.0_24 route-table unicast 
+set network virtual-router LAB routing-table ip static-route SR_10.1.128.0_24 nexthop ip-address 10.1.0.81
+set network virtual-router LAB routing-table ip static-route SR_10.1.128.0_24 bfd profile None
+set network virtual-router LAB routing-table ip static-route SR_10.1.128.0_24 path-monitor enable no
+set network virtual-router LAB routing-table ip static-route SR_10.1.128.0_24 path-monitor failure-condition any
+set network virtual-router LAB routing-table ip static-route SR_10.1.128.0_24 path-monitor hold-time 2
+set network virtual-router LAB routing-table ip static-route SR_10.1.128.0_24 interface ethernet1/4
+set network virtual-router LAB routing-table ip static-route SR_10.1.128.0_24 metric 10
+set network virtual-router LAB routing-table ip static-route SR_10.1.128.0_24 destination 10.1.128.0/24
+set network virtual-router LAB routing-table ip static-route SR_10.1.128.0_24 route-table unicast 
+set network virtual-router LAB routing-table ip static-route SR_10.1.129.0_24 nexthop ip-address 10.1.0.97
+set network virtual-router LAB routing-table ip static-route SR_10.1.129.0_24 bfd profile None
+set network virtual-router LAB routing-table ip static-route SR_10.1.129.0_24 path-monitor enable no
+set network virtual-router LAB routing-table ip static-route SR_10.1.129.0_24 path-monitor failure-condition any
+set network virtual-router LAB routing-table ip static-route SR_10.1.129.0_24 path-monitor hold-time 2
+set network virtual-router LAB routing-table ip static-route SR_10.1.129.0_24 interface ethernet1/5
+set network virtual-router LAB routing-table ip static-route SR_10.1.129.0_24 metric 10
+set network virtual-router LAB routing-table ip static-route SR_10.1.129.0_24 destination 10.1.129.0/24
+set network virtual-router LAB routing-table ip static-route SR_10.1.129.0_24 route-table unicast 
+set network virtual-router LAB routing-table ip static-route SR_10.1.130.0_24 nexthop ip-address 10.1.0.97
+set network virtual-router LAB routing-table ip static-route SR_10.1.130.0_24 bfd profile None
+set network virtual-router LAB routing-table ip static-route SR_10.1.130.0_24 path-monitor enable no
+set network virtual-router LAB routing-table ip static-route SR_10.1.130.0_24 path-monitor failure-condition any
+set network virtual-router LAB routing-table ip static-route SR_10.1.130.0_24 path-monitor hold-time 2
+set network virtual-router LAB routing-table ip static-route SR_10.1.130.0_24 interface ethernet1/5
+set network virtual-router LAB routing-table ip static-route SR_10.1.130.0_24 metric 10
+set network virtual-router LAB routing-table ip static-route SR_10.1.130.0_24 destination 10.1.130.0/24
+set network virtual-router LAB routing-table ip static-route SR_10.1.130.0_24 route-table unicast 
+set network virtual-router LAB routing-table ip static-route SR_10.1.1.128_25 path-monitor enable no
+set network virtual-router LAB routing-table ip static-route SR_10.1.1.128_25 path-monitor failure-condition any
+set network virtual-router LAB routing-table ip static-route SR_10.1.1.128_25 path-monitor hold-time 2
+set network virtual-router LAB routing-table ip static-route SR_10.1.1.128_25 nexthop ip-address 10.1.0.65
+set network virtual-router LAB routing-table ip static-route SR_10.1.1.128_25 bfd profile None
+set network virtual-router LAB routing-table ip static-route SR_10.1.1.128_25 interface ethernet1/3
+set network virtual-router LAB routing-table ip static-route SR_10.1.1.128_25 metric 10
+set network virtual-router LAB routing-table ip static-route SR_10.1.1.128_25 destination 10.1.1.128/25
+set network virtual-router LAB routing-table ip static-route SR_10.1.1.128_25 route-table unicast 
+
+set zone ZN_INET network layer3 ethernet1/1
+set zone ZN_WAN network layer3 ethernet1/2
+set zone ZN_DMZ network layer3 ethernet1/3
+set zone ZN_SRVHS network layer3 ethernet1/4
+set zone ZN_SRVMS network layer3 ethernet1/5
+set zone ZN_NETMG network layer3 ethernet1/6
+
+set rulebase default-security-rules rules intrazone-default action allow
+set rulebase default-security-rules rules intrazone-default log-start no
+set rulebase default-security-rules rules intrazone-default log-end yes
+set rulebase default-security-rules rules interzone-default action allow
+set rulebase default-security-rules rules interzone-default log-start no
+set rulebase default-security-rules rules interzone-default log-end yes
+
+set rulebase nat rules NPR_ANY_TO_INET source-translation dynamic-ip-and-port translated-address 10.1.1.4
+set rulebase nat rules NPR_ANY_TO_INET to ZN_INET
+set rulebase nat rules NPR_ANY_TO_INET from [ ZN_DMZ ZN_NETMG ZN_SRVHS ZN_SRVMS ]
+set rulebase nat rules NPR_ANY_TO_INET source any
+set rulebase nat rules NPR_ANY_TO_INET destination any
+set rulebase nat rules NPR_ANY_TO_INET service any
+set rulebase nat rules NPR_ANY_TO_INET to-interface ethernet1/1
+set rulebase nat rules NPR_INET_TO_DMZ destination-translation translated-address 10.1.11.128/25
+set rulebase nat rules NPR_INET_TO_DMZ to ZN_DMZ
+set rulebase nat rules NPR_INET_TO_DMZ from ZN_INET
+set rulebase nat rules NPR_INET_TO_DMZ source any
+set rulebase nat rules NPR_INET_TO_DMZ destination 10.1.1.128/25
+set rulebase nat rules NPR_INET_TO_DMZ service any
+set rulebase nat rules NPR_INET_TO_DMZ to-interface ethernet1/3
+
+set deviceconfig plugins vm_series azure-ha-config client-id xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+set deviceconfig plugins vm_series azure-ha-config client-secret xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+set deviceconfig plugins vm_series azure-ha-config resource-group RG_LAB1_PALOALTO
+set deviceconfig plugins vm_series azure-ha-config subscription-id xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+set deviceconfig plugins vm_series azure-ha-config tenant-id xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+
+set network interface ethernet ethernet1/7 ha
+set deviceconfig high-availability interface ha1 
+set deviceconfig high-availability interface ha2 port ethernet1/7
+set deviceconfig high-availability interface ha2 ip-address 10.1.0.133
+set deviceconfig high-availability interface ha2 netmask 255.255.255.240
+set deviceconfig high-availability group group-id 1
+set deviceconfig high-availability group description RG_LAB1_PALOALTO
+set deviceconfig high-availability group peer-ip 10.1.0.42
+set deviceconfig high-availability group election-option device-priority 1
+set deviceconfig high-availability group election-option preemptive yes
+set deviceconfig high-availability group election-option timers recommended 
+set deviceconfig high-availability group state-synchronization ha2-keep-alive enabled yes
+set deviceconfig high-availability enabled yes
+
+set network interface ethernet ethernet1/7 ha
+set deviceconfig high-availability interface ha1 
+set deviceconfig high-availability interface ha2 port ethernet1/7
+set deviceconfig high-availability interface ha2 ip-address 10.1.0.134
+set deviceconfig high-availability interface ha2 netmask 255.255.255.240
+set deviceconfig high-availability group group-id 1
+set deviceconfig high-availability group description RG_LAB1_PALOALTO
+set deviceconfig high-availability group peer-ip 10.1.0.41
+set deviceconfig high-availability group election-option device-priority 1
+set deviceconfig high-availability group election-option preemptive yes
+set deviceconfig high-availability group election-option timers recommended 
+set deviceconfig high-availability group state-synchronization ha2-keep-alive enabled yes
+set deviceconfig high-availability enabled yes
+

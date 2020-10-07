@@ -1,0 +1,64 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "network_id": {
+            "type": "String",
+            "defaultValue": null
+        },
+        "site_id": {
+            "type": "string",
+            "defaultValue": null
+        },
+        "er_circuit_id": {
+            "type": "string",
+            "defaultValue": null
+        },
+        "er_auth_key": {
+            "type": "string",
+            "defaultValue": null
+        }
+    },
+    "variables": {
+        "network_id": "[parameters('network_id')]",
+        "site_id": "[parameters('site_id')]",
+        "er_circuit_id": "[parameters('er_circuit_id')]",
+        "er_auth_key": "[parameters('er_auth_key')]",
+        "tags": {"Department": "IT", "Project": "[concat(variables('site_id'), ' Azure Data Center')]", "Project Manager": "Sebastian Majewski"},
+
+        "nsg_name_prefix": "[concat('NSG_', variables('site_id'), '_10_', variables('network_id'))]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2019-09-01",
+            "name": "[concat(variables('nsg_name_prefix'), '_1_0__24')]",
+            "location": "[resourceGroup().location]",
+            "tags": "[variables('tags')]",
+            "resources": [
+                {
+                    "type": "Microsoft.Network/networkSecurityGroups/securityRules",
+                    "apiVersion": "2019-09-01",
+                    "name": "[concat(variables('nsg_name_prefix'), '_1_0__24/PERMIT_INET_TO_DMZ')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/networkSecurityGroups', concat(variables('nsg_name_prefix'), '_1_0__24'))]"
+                    ],
+                    "properties": {
+                        "protocol": "*",
+                        "sourcePortRange": "*",
+                        "destinationPortRange": "*",
+                        "sourceAddressPrefix": "Internet",
+                        "destinationAddressPrefix": "[concat('10.', variables('network_id'), '.1.128/25')]",
+                        "access": "Allow",
+                        "priority": 100,
+                        "direction": "Inbound",
+                        "sourcePortRanges": [],
+                        "destinationPortRanges": [],
+                        "sourceAddressPrefixes": [],
+                        "destinationAddressPrefixes": []
+                    }
+                }
+            ]
+        }
+    ]
+}

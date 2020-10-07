@@ -1,0 +1,465 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.31",
+    "parameters": {
+        "network_id": {
+            "type": "String",
+            "defaultValue": null
+        },
+        "site_id": {
+            "type": "string",
+            "defaultValue": null
+        },
+        "username": {
+            "type": "string",
+            "defaultValue": null
+        },
+        "password": {
+            "type": "string",
+            "defaultValue": null
+        }
+    },
+    "variables": {
+        "network_id": "[parameters('network_id')]",
+        "site_id": "[parameters('site_id')]",
+        "username": "[parameters('username')]",
+        "password": "[parameters('password')]",
+
+        "tags": {"Department": "IT", "Project": "[concat(variables('site_id'), ' Azure Data Center')]", "Project Manager": "Sebastian Majewski"},
+
+        "pa_name": "[concat(variables('site_id'), 'PA1')]",
+
+        "vnet_name": "[concat('VNET_', variables('site_id'), '_CORE')]",
+        "subnet_name_prefix": "[concat('NET_10_', variables('network_id'))]",
+        "subnet_address_prefix": "[concat('10.', variables('network_id'))]",
+
+        "subnet_name_0": "[concat(variables('subnet_name_prefix'), '_0_32__28')]",
+        "subnet_address_0": "[concat(variables('subnet_address_prefix'), '.0.41')]",
+        "subnet_name_1": "[concat(variables('subnet_name_prefix'), '_1_0__24')]",
+        "subnet_address_1": "[concat(variables('subnet_address_prefix'), '.1.5')]",
+        "subnet_address_floating_1": "[concat(variables('subnet_address_prefix'), '.1.4')]",
+        "subnet_name_2": "[concat(variables('subnet_name_prefix'), '_0_48__28')]",
+        "subnet_address_2": "[concat(variables('subnet_address_prefix'), '.0.53')]",
+        "subnet_address_floating_2": "[concat(variables('subnet_address_prefix'), '.0.52')]",
+        "subnet_name_3": "[concat(variables('subnet_name_prefix'), '_0_64__28')]",
+        "subnet_address_3": "[concat(variables('subnet_address_prefix'), '.0.69')]",
+        "subnet_address_floating_3": "[concat(variables('subnet_address_prefix'), '.0.68')]",
+        "subnet_name_4": "[concat(variables('subnet_name_prefix'), '_0_80__28')]",
+        "subnet_address_4": "[concat(variables('subnet_address_prefix'), '.0.85')]",
+        "subnet_address_floating_4": "[concat(variables('subnet_address_prefix'), '.0.84')]",
+        "subnet_name_5": "[concat(variables('subnet_name_prefix'), '_0_96__28')]",
+        "subnet_address_5": "[concat(variables('subnet_address_prefix'), '.0.101')]",
+        "subnet_address_floating_5": "[concat(variables('subnet_address_prefix'), '.0.100')]",
+        "subnet_name_6": "[concat(variables('subnet_name_prefix'), '_0_112__28')]",
+        "subnet_address_6": "[concat(variables('subnet_address_prefix'), '.0.117')]",
+        "subnet_address_floating_6": "[concat(variables('subnet_address_prefix'), '.0.116')]",
+        "subnet_name_7": "[concat(variables('subnet_name_prefix'), '_0_128__28')]",
+        "subnet_address_7": "[concat(variables('subnet_address_prefix'), '.0.133')]"
+    },
+    "resources": [
+        {
+            "apiVersion": "2019-02-01",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "[concat('IP_', variables('pa_name'), '_ETH1_0')]",
+            "location": "[resourceGroup().location]",
+            "tags": "[variables('tags')]",
+            "sku": {
+                "name": "Standard"
+            },
+            "properties": {
+                "publicIPAllocationMethod": "Static",
+                "idleTimeoutInMinutes": "4",
+                "publicIpAddressVersion": "IPv4",
+                "dnsSettings": {
+                    "domainNameLabel": "[toLower(variables('pa_name'))]",
+                    "fqdn": "[concat(toLower(variables('pa_name')), '.', resourceGroup().location, '.cloudapp.azure.com')]"
+                },
+                "ipTags": []
+            }
+        },
+        {
+            "apiVersion": "2019-02-01",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "[concat('IP_', variables('site_id'), 'PA_ETH1_1_FLOATING')]",
+            "location": "[resourceGroup().location]",
+            "tags": "[variables('tags')]",
+            "sku": {
+                "name": "Standard"
+            },
+            "properties": {
+                "publicIPAllocationMethod": "Static",
+                "idleTimeoutInMinutes": "4",
+                "publicIpAddressVersion": "IPv4",
+                "ipTags": []
+            }
+        },
+        {
+            "name": "[concat('NIC_', variables('pa_name'), '_ETH1_0')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2017-10-01",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/publicIPAddresses/', concat('IP_', variables('pa_name'), '_ETH1_0'))]"
+            ],
+            "tags": "[variables('tags')]",
+            "properties": {
+                "enableIPForwarding": false,
+                "enableAcceleratedNetworking": "false",
+                "ipConfigurations": [
+                    {
+                        "name": "PRIMARY",
+                        "properties": {
+                            "privateIPAllocationMethod": "Static",
+                            "subnet": {
+                                "id": "[resourceId(concat('RG_', variables('site_id'), '_NETWORK'), 'Microsoft.Network/virtualNetworks/subnets', variables('vnet_name'), variables('subnet_name_0'))]"
+                            },
+                            "privateIpAddress": "[variables('subnet_address_0')]",
+                            "publicIpAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', concat('IP_', variables('pa_name'), '_ETH1_0'))]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "[concat('NIC_', variables('pa_name'), '_ETH1_1')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2017-10-01",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/publicIPAddresses/', concat('IP_', variables('site_id'), 'PA_ETH1_1_FLOATING'))]"
+            ],
+            "tags": "[variables('tags')]",
+            "properties": {
+                "enableIPForwarding": true,
+                "enableAcceleratedNetworking": "true",
+                "ipConfigurations": [
+                    {
+                        "name": "PRIMARY",
+                        "properties": {
+                            "privateIPAllocationMethod": "Static",
+                            "subnet": {
+                                "id": "[resourceId(concat('RG_', variables('site_id'), '_NETWORK'), 'Microsoft.Network/virtualNetworks/subnets', variables('vnet_name'), variables('subnet_name_1'))]"
+                            },
+                            "primary": true,
+                            "privateIpAddress": "[variables('subnet_address_1')]"
+                        }
+                    },
+                    {
+                        "name": "FLOATING",
+                        "properties": {
+                            "privateIPAllocationMethod": "Static",
+                            "subnet": {
+                                "id": "[resourceId(concat('RG_', variables('site_id'), '_NETWORK'), 'Microsoft.Network/virtualNetworks/subnets', variables('vnet_name'), variables('subnet_name_1'))]"
+                            },
+                            "primary": false,
+                            "privateIpAddress": "[variables('subnet_address_floating_1')]",
+                            "publicIpAddress": {
+                                "id": "[resourceId(concat('RG_', variables('site_id'), '_PALOALTO'), 'Microsoft.Network/publicIPAddresses', concat('IP_', variables('site_id'), 'PA_ETH1_1_FLOATING'))]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "[concat('NIC_', variables('pa_name'), '_ETH1_2')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2017-10-01",
+            "location": "[resourceGroup().location]",
+            "tags": "[variables('tags')]",
+            "properties": {
+                "enableIPForwarding": true,
+                "enableAcceleratedNetworking": "true",
+                "ipConfigurations": [
+                    {
+                        "name": "PRIMARY",
+                        "properties": {
+                            "privateIPAllocationMethod": "Static",
+                            "subnet": {
+                                "id": "[resourceId(concat('RG_', variables('site_id'), '_NETWORK'), 'Microsoft.Network/virtualNetworks/subnets', variables('vnet_name'), variables('subnet_name_2'))]"
+                            },
+                            "primary": true,
+                            "privateIpAddress": "[variables('subnet_address_2')]"
+                        }
+                    },
+                    {
+                        "name": "FLOATING",
+                        "properties": {
+                            "privateIPAllocationMethod": "Static",
+                            "subnet": {
+                                "id": "[resourceId(concat('RG_', variables('site_id'), '_NETWORK'), 'Microsoft.Network/virtualNetworks/subnets', variables('vnet_name'), variables('subnet_name_2'))]"
+                            },
+                            "primary": false,
+                            "privateIpAddress": "[variables('subnet_address_floating_2')]"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "[concat('NIC_', variables('pa_name'), '_ETH1_3')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2017-10-01",
+            "location": "[resourceGroup().location]",
+            "tags": "[variables('tags')]",
+            "properties": {
+                "enableIPForwarding": true,
+                "enableAcceleratedNetworking": "true",
+                "ipConfigurations": [
+                    {
+                        "name": "PRIMARY",
+                        "properties": {
+                            "privateIPAllocationMethod": "Static",
+                            "subnet": {
+                                "id": "[resourceId(concat('RG_', variables('site_id'), '_NETWORK'), 'Microsoft.Network/virtualNetworks/subnets', variables('vnet_name'), variables('subnet_name_3'))]"
+                            },
+                            "primary": true,
+                            "privateIpAddress": "[variables('subnet_address_3')]"
+                        }
+                    },
+                    {
+                        "name": "FLOATING",
+                        "properties": {
+                            "privateIPAllocationMethod": "Static",
+                            "subnet": {
+                                "id": "[resourceId(concat('RG_', variables('site_id'), '_NETWORK'), 'Microsoft.Network/virtualNetworks/subnets', variables('vnet_name'), variables('subnet_name_3'))]"
+                            },
+                            "primary": false,
+                            "privateIpAddress": "[variables('subnet_address_floating_3')]"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "[concat('NIC_', variables('pa_name'), '_ETH1_4')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2017-10-01",
+            "location": "[resourceGroup().location]",
+            "tags": "[variables('tags')]",
+            "properties": {
+                "enableIPForwarding": true,
+                "enableAcceleratedNetworking": "true",
+                "ipConfigurations": [
+                    {
+                        "name": "PRIMARY",
+                        "properties": {
+                            "privateIPAllocationMethod": "Static",
+                            "subnet": {
+                                "id": "[resourceId(concat('RG_', variables('site_id'), '_NETWORK'), 'Microsoft.Network/virtualNetworks/subnets', variables('vnet_name'), variables('subnet_name_4'))]"
+                            },
+                            "primary": true,
+                            "privateIpAddress": "[variables('subnet_address_4')]"
+                        }
+                    },
+                    {
+                        "name": "FLOATING",
+                        "properties": {
+                            "privateIPAllocationMethod": "Static",
+                            "subnet": {
+                                "id": "[resourceId(concat('RG_', variables('site_id'), '_NETWORK'), 'Microsoft.Network/virtualNetworks/subnets', variables('vnet_name'), variables('subnet_name_4'))]"
+                            },
+                            "primary": false,
+                            "privateIpAddress": "[variables('subnet_address_floating_4')]"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "[concat('NIC_', variables('pa_name'), '_ETH1_5')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2017-10-01",
+            "location": "[resourceGroup().location]",
+            "tags": "[variables('tags')]",
+            "properties": {
+                "enableIPForwarding": true,
+                "enableAcceleratedNetworking": "true",
+                "ipConfigurations": [
+                    {
+                        "name": "PRIMARY",
+                        "properties": {
+                            "privateIPAllocationMethod": "Static",
+                            "subnet": {
+                                "id": "[resourceId(concat('RG_', variables('site_id'), '_NETWORK'), 'Microsoft.Network/virtualNetworks/subnets', variables('vnet_name'), variables('subnet_name_5'))]"
+                            },
+                            "primary": true,
+                            "privateIpAddress": "[variables('subnet_address_5')]"
+                        }
+                    },
+                    {
+                        "name": "FLOATING",
+                        "properties": {
+                            "privateIPAllocationMethod": "Static",
+                            "subnet": {
+                                "id": "[resourceId(concat('RG_', variables('site_id'), '_NETWORK'), 'Microsoft.Network/virtualNetworks/subnets', variables('vnet_name'), variables('subnet_name_5'))]"
+                            },
+                            "primary": false,
+                            "privateIpAddress": "[variables('subnet_address_floating_5')]"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "[concat('NIC_', variables('pa_name'), '_ETH1_6')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2017-10-01",
+            "location": "[resourceGroup().location]",
+            "tags": "[variables('tags')]",
+            "properties": {
+                "enableIPForwarding": true,
+                "enableAcceleratedNetworking": "true",
+                "ipConfigurations": [
+                    {
+                        "name": "PRIMARY",
+                        "properties": {
+                            "privateIPAllocationMethod": "Static",
+                            "subnet": {
+                                "id": "[resourceId(concat('RG_', variables('site_id'), '_NETWORK'), 'Microsoft.Network/virtualNetworks/subnets', variables('vnet_name'), variables('subnet_name_6'))]"
+                            },
+                            "primary": true,
+                            "privateIpAddress": "[variables('subnet_address_6')]"
+                        }
+                    },
+                    {
+                        "name": "FLOATING",
+                        "properties": {
+                            "privateIPAllocationMethod": "Static",
+                            "subnet": {
+                                "id": "[resourceId(concat('RG_', variables('site_id'), '_NETWORK'), 'Microsoft.Network/virtualNetworks/subnets', variables('vnet_name'), variables('subnet_name_6'))]"
+                            },
+                            "primary": false,
+                            "privateIpAddress": "[variables('subnet_address_floating_6')]"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "[concat('NIC_', variables('pa_name'), '_ETH1_7')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2017-10-01",
+            "location": "[resourceGroup().location]",
+            "tags": "[variables('tags')]",
+            "properties": {
+                "enableIPForwarding": true,
+                "enableAcceleratedNetworking": "true",
+                "ipConfigurations": [
+                    {
+                        "name": "PRIMARY",
+                        "properties": {
+                            "privateIPAllocationMethod": "Static",
+                            "subnet": {
+                                "id": "[resourceId(concat('RG_', variables('site_id'), '_NETWORK'), 'Microsoft.Network/virtualNetworks/subnets', variables('vnet_name'), variables('subnet_name_7'))]"
+                            },
+                            "primary": true,
+                            "privateIpAddress": "[variables('subnet_address_7')]"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "[variables('pa_name')]",
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2018-06-01",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces', concat('NIC_', variables('pa_name'), '_ETH1_0'))]",
+                "[resourceId('Microsoft.Network/networkInterfaces', concat('NIC_', variables('pa_name'), '_ETH1_1'))]",
+                "[resourceId('Microsoft.Network/networkInterfaces', concat('NIC_', variables('pa_name'), '_ETH1_2'))]",
+                "[resourceId('Microsoft.Network/networkInterfaces', concat('NIC_', variables('pa_name'), '_ETH1_3'))]",
+                "[resourceId('Microsoft.Network/networkInterfaces', concat('NIC_', variables('pa_name'), '_ETH1_4'))]",
+                "[resourceId('Microsoft.Network/networkInterfaces', concat('NIC_', variables('pa_name'), '_ETH1_5'))]",
+                "[resourceId('Microsoft.Network/networkInterfaces', concat('NIC_', variables('pa_name'), '_ETH1_6'))]",
+                "[resourceId('Microsoft.Network/networkInterfaces', concat('NIC_', variables('pa_name'), '_ETH1_7'))]"
+            ],
+            "location": "[resourceGroup().location]",
+            "tags": "[variables('tags')]",
+            "plan": {
+                "name": "byol",
+                "product": "vmseries-flex",
+                "publisher": "paloaltonetworks"
+            },
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "Standard_D4_v2"
+                },
+                "osProfile": {
+                    "computerName": "[variables('pa_name')]",
+                    "adminUsername": "[variables('username')]",
+                    "adminPassword": "[variables('password')]",
+                    "linuxConfiguration": null,
+                    "customData": null
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "paloaltonetworks",
+                        "offer": "vmseries1",
+                        "sku": "byol",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "createOption": "FromImage"
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat('NIC_', variables('pa_name'), '_ETH1_0'))]",
+                            "properties": {
+                                "primary": true
+                            }
+                        },
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat('NIC_', variables('pa_name'), '_ETH1_1'))]",
+                            "properties": {
+                                "primary": false
+                            }
+                        },
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat('NIC_', variables('pa_name'), '_ETH1_2'))]",
+                            "properties": {
+                                "primary": false
+                            }
+                        },
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat('NIC_', variables('pa_name'), '_ETH1_3'))]",
+                            "properties": {
+                                "primary": false
+                            }
+                        },
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat('NIC_', variables('pa_name'), '_ETH1_4'))]",
+                            "properties": {
+                                "primary": false
+                            }
+                        },
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat('NIC_', variables('pa_name'), '_ETH1_5'))]",
+                            "properties": {
+                                "primary": false
+                            }
+                        },
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat('NIC_', variables('pa_name'), '_ETH1_6'))]",
+                            "properties": {
+                                "primary": false
+                            }
+                        },
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat('NIC_', variables('pa_name'), '_ETH1_7'))]",
+                            "properties": {
+                                "primary": false
+                            }
+                        }
+                    ]
+                },
+                "availabilitySet": null
+            },
+            "zones": ["1"]
+        }
+    ]
+}
