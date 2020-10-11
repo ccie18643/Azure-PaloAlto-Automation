@@ -4,6 +4,5 @@ Azure lab configuration used for automatic deployment of PaloAlto virtual firewa
 
 ### Lab diagram
 ![Azure lab diagram](https://github.com/ccie18643/Azure-PaloAlto-Automation-Lab/blob/master/pictures/diag01.png)
-![Azure lab diagram](https://github.com/ccie18643/AWS-Terraform-Ansible-Automation-Lab/blob/master/pictures/diag01.png)
 
 
